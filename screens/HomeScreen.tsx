@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, Image, TextInput, Button, StyleSheet} from 'react-native';
+import CustomButton from '../components/CustomButton';
 
 const HomeScreen = () => {
   const [text, setText] = useState('');
@@ -12,7 +13,9 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={{uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png'}}
+        source={{
+          uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png',
+        }}
         style={styles.logo}
       />
       <Text style={styles.welcome}>Welcome</Text>
@@ -22,7 +25,8 @@ const HomeScreen = () => {
         value={text}
         onChangeText={setText}
       />
-      <Button title="Submit" onPress={handleSubmit} />
+      <CustomButton width={200} label="Submit" />
+      {/* <Button title="Submit" onPress={handleSubmit} /> */}
     </View>
   );
 };
@@ -44,10 +48,11 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   input: {
-    width: 200,
+    width: '80%',
     height: 40,
     borderColor: '#ccc',
     borderWidth: 1,
+    borderRadius:20,
     padding: 10,
     margin: 10,
   },

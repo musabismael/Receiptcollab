@@ -14,7 +14,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Data Entry" component={DataEntryScreen} />
+        {/* <Stack.Screen name="Data Entry" component={DataEntryScreen} /> */}
         <Stack.Screen name="Home" component={HomeScreen} />
         {/* <Stack.Screen name="Bill Split" component={BillSplitScreen} />
         <Stack.Screen name="QR Code" component={QRCodeScreen} />
