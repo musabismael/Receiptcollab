@@ -1,19 +1,59 @@
-import {Image, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import ImagePicker from 'react-native-image-picker';
 
 const ReceiptComponent = () => {
+  const [imageSource, setImageSource] = useState(null);
+
+  const handleUploadReceipt = () => {
+    ImagePicker.showImagePicker({title: 'Select Image'}, response => {
+      if (!response.didCancel && !response.error) {
+        // Image selected successfully
+        setImageSource({uri: response.uri});
+      }
+    });
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.uploadReceipt}>
-        <Text style={{color: '#AFCFCA'}}>Upload Receipt</Text>
-      </View>
-      <View style={styles.uploadReceipt}>
-        <Image
-          source={require('../assets/Camera.png')}
-          style={{width: 20, height: 20}}
-        />
-        <Text style={{color: '#AFCFCA'}}>Camera</Text>
-      </View>
+      <TouchableOpacity
+        style={[styles.actionButton, imageSource && styles.doneButton]}
+        onPress={handleUploadReceipt}
+        activeOpacity={0.7}>
+        {imageSource ? (
+          <>
+            <Image source={imageSource} style={styles.image} />
+            <Text style={styles.buttonTextDone}>Done</Text>
+          </>
+        ) : (
+          <Text style={styles.buttonText}>Upload Receipt</Text>
+        )}
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.actionButton, imageSource && styles.doneButton]}
+        onPress={handleUploadReceipt}
+        activeOpacity={0.7}>
+        {imageSource ? (
+          <>
+            <Image source={imageSource} style={styles.image} />
+            <Text style={styles.buttonTextDone}>Done</Text>
+          </>
+        ) : (
+          <View>
+            <Image
+              source={require('../assets/Camera.png')}
+              style={{
+                width: 20,
+                height: 20,
+                alignContent: 'center',
+                alignSelf: 'center',
+              }}
+            />
+
+            <Text style={styles.buttonText}>Camera</Text>
+          </View>
+        )}
+      </TouchableOpacity>
     </View>
   );
 };
@@ -24,20 +64,30 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     width: '100%',
-    alignContent: 'center',
     alignItems: 'center',
   },
-  uploadReceipt: {
+  actionButton: {
     width: '80%',
     height: 55,
-    color: '#AFCFCA',
     borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    textAlign: 'center',
-    alignContent: 'center',
     borderStyle: 'dashed',
     marginBottom: 5,
+    borderRadius: 10,
+  },
+  doneButton: {
+    borderColor: 'green',
+  },
+  buttonText: {
+    color: '#AFCFCA',
+  },
+  buttonTextDone: {
+    color: 'green',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
     borderRadius: 10,
   },
 });

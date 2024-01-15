@@ -152,7 +152,7 @@ const BottomTabNavigatorComponent = () => {
         options={{
           title: 'Calculator',
           headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <TouchableOpacity onPress={() => navigation.navigate('Entry')}>
               <Icon name="arrow-back" size={24} color="#27C4A6" />
             </TouchableOpacity>
           ),
