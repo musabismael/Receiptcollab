@@ -1,61 +1,72 @@
-import React, {useState} from 'react';
-import {View, Text, Image, TextInput, Button, StyleSheet} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, Image, TextInput, StyleSheet} from 'react-native';
+import {Button, TextInput as PaperTextInput} from 'react-native-paper';
 import CustomButton from '../components/CustomButton';
 
-const HomeScreen = () => {
+const HomeScreen = ({route, navigation}) => {
   const [text, setText] = useState('');
+  const [errors, setErrors] = useState('');
 
-  const handleSubmit = () => {
-    // do something with the text input
-    alert(`You entered: ${text}`);
-  };
+  useEffect(() => {
+    if (text.trim() === '') {
+      setErrors('Name is required');
+    } else {
+      setErrors('');
+    }
+  }, [text]);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f5f5f5',
+      }}>
       <Image
-        source={{
-          uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png',
-        }}
-        style={styles.logo}
+        source={require('../assets/logo.png')}
+        style={{width: 100, height: 100, marginBottom: 5}}
       />
-      <Text style={styles.welcome}>Welcome</Text>
+      <Text style={{fontSize: 22, fontWeight: 'bold', color:'#324E47', marginBottom: 10}}>
+        Receiptcollab
+      </Text>
+
       <TextInput
+        placeholder="Enter Name"
+        onChangeText={inputText => setText(inputText)}
         style={styles.input}
-        placeholder="Enter something"
-        value={text}
-        onChangeText={setText}
       />
-      <CustomButton width={200} label="Submit" />
-      {/* <Button title="Submit" onPress={handleSubmit} /> */}
+
+
+      <CustomButton
+        label="Get Started"
+        width={250}
+        height={40}
+        bgColor="#2A393C"
+        textColor="#FFFFFF"
+        onPress={() =>{
+          (!errors)
+          navigation.navigate('Entry');
+
+        }}
+        borderRadius={20}
+      />
+     
+            {errors && <Text style={{color: 'red'}}>{errors}</Text>}
+
     </View>
   );
 };
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  logo: {
-    width: 100,
-    height: 100,
-  },
-  welcome: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    margin: 10,
-  },
   input: {
+    height: 50,
     width: '80%',
-    height: 40,
-    borderColor: '#ccc',
+    borderColor: '#AFCFCA',
     borderWidth: 1,
-    borderRadius:20,
-    padding: 10,
-    margin: 10,
+    backgroundColor: '#EBF3F2',
+    marginVertical: 5,
+    borderRadius: 10,
+    paddingHorizontal: 10,
   },
-});
-
+})
 export default HomeScreen;

@@ -22,14 +22,13 @@ export default ReceiptComponent;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#fff',
     width: '100%',
     alignContent: 'center',
     alignItems: 'center',
   },
   uploadReceipt: {
-    width: '90%',
+    width: '80%',
     height: 55,
     color: '#AFCFCA',
     borderWidth: 1,
@@ -38,7 +37,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignContent: 'center',
     borderStyle: 'dashed',
-    marginBottom: 10,
+    marginBottom: 5,
     borderRadius: 10,
   },
 });
