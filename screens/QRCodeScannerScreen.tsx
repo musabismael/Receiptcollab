@@ -3,7 +3,7 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
 
-const App = ({navigation}) => {
+const QrCodeScan = ({navigation}: any) => {
   useEffect(() => {}, []);
 
   const onRead = result => {
@@ -58,4 +58,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default QrCodeScan;

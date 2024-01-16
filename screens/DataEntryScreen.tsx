@@ -1,7 +1,6 @@
 import {
   Image,
-  ImageBackground,
-  ScrollView,
+  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -16,7 +15,6 @@ import QRCodeScannerScreen from './QRCodeScannerScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import QRCode from 'react-native-qrcode';
 
 interface Props {
   navigation: any;
@@ -30,16 +28,25 @@ const DataEntryScreen: React.FC<Props> = props => {
   const [selectedButton, setSelectedButton] = useState('');
   const [resultAmount, setResultAmount] = useState(0);
   const [chooseButton, setChooseButton] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
-  const storgePress = async () => => {
+  const handleSavePress = () => {
+    console.log(inputValue);
+    setSelectedButton(inputValue);
+    setModalVisible(false);
+  };
+  const storgePress = async () => {
     try {
-      const userId = await AsyncStorage.getItem("userId");
+      const userId = await AsyncStorage.getItem('userId');
       if (!userId) {
-        setErrorMessages("Error: User ID not found in AsyncStorage.");
+        setErrorMessages('Error: User ID not found in AsyncStorage.');
         return;
       }
-  
+      const newReceiptId = Math.round(Math.random() * 1000000);
+
       const newReceipt = {
+        newReceiptId,
         receiptName,
         billDate,
         billAmount,
@@ -47,39 +54,37 @@ const DataEntryScreen: React.FC<Props> = props => {
         splitPerson: selectedButton,
         resultAmount,
       };
-  
-      if (!newReceipt.receiptName || !newReceipt.billDate || !newReceipt.billAmount || !newReceipt.splitMode || !newReceipt.splitPerson || newReceipt.resultAmount === 0) {
-        setErrorMessages("Error: Please fill in all fields.");
+
+      if (
+        !newReceipt.receiptName ||
+        !newReceipt.billDate ||
+        !newReceipt.billAmount ||
+        !newReceipt.splitMode ||
+        !newReceipt.splitPerson ||
+        newReceipt.resultAmount === 0
+      ) {
+        setErrorMessages('Error: Please fill in all fields.');
         return;
       }
-  
+
       const existingReceiptsString = await AsyncStorage.getItem(userId);
-  
+
       const existingReceipts = existingReceiptsString
         ? JSON.parse(existingReceiptsString)
         : [];
-  
+
       existingReceipts.push(newReceipt);
-  
+
       await AsyncStorage.setItem(userId, JSON.stringify(existingReceipts));
-  
-      // Generate QR code
-      const qrCodeData = JSON.stringify(newReceipt);
-      
-      const qrCodeImage = await QRCode.toDataURL(qrCodeData);
-  
-      // Store QR code in AsyncStorage
-      await AsyncStorage.setItem(`${userId}_qrCode`, qrCodeImage);
-  
-      setErrorMessages("Success: Receipt saved successfully!");
-      console.log("Receipt saved successfully!");
+
+      setErrorMessages('Success: Receipt saved successfully!');
+      console.log('Receipt saved successfully!');
     } catch (error) {
-      setErrorMessages("Error: Failed to save receipt to AsyncStorage.");
-      console.error("Error saving receipt to AsyncStorage:", error);
+      setErrorMessages('Error: Failed to save receipt to AsyncStorage.');
+      console.error('Error saving receipt to AsyncStorage:', error);
     }
   };
-  
-  
+
   const handleSplitModePress = () => {
     setErrorMessages('');
 
@@ -118,7 +123,11 @@ const DataEntryScreen: React.FC<Props> = props => {
     }
     if (chooseButton === 'equal') {
       const splitAmount = amount / parseInt(selectedButton);
-      setResultAmount(splitAmount);
+      let roundedAmount = Math.round(splitAmount * 100) / 100; // round to 2 decimal places
+      if (roundedAmount > splitAmount) {
+        roundedAmount = Math.round(splitAmount * 10) / 10; // reduce digits
+      }
+      setResultAmount(roundedAmount);
     }
     if (chooseButton === 'custom') {
       setResultAmount(amount);
@@ -146,7 +155,7 @@ const DataEntryScreen: React.FC<Props> = props => {
           placeholder="Bill Amount"
           style={styles.input}
           value={billAmount}
-          keyboardType='numeric'
+          keyboardType="numeric"
           onChangeText={text => setBillAmount(text)}
         />
         <Text style={styles.errorText}>{errorMessages}</Text>
@@ -180,7 +189,10 @@ const DataEntryScreen: React.FC<Props> = props => {
 
         <CustomButton
           label="Custom"
-          onPress={() => setSelectedButton('Custom')}
+          onPress={() => {
+            setSelectedButton('Custom');
+            setModalVisible(true);
+          }}
           width={80}
           textColor="#0A8E74"
           selected={selectedButton === 'Custom'}
@@ -232,6 +244,26 @@ const DataEntryScreen: React.FC<Props> = props => {
           </TouchableOpacity>
         </View>
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible} // Set the visibility of the modal
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <TextInput
+              style={styles.textInput}
+              value={inputValue}
+              onChangeText={text => setInputValue(text)}
+              placeholder="Enter split person"
+              keyboardType="numeric"
+            />
+            <CustomButton label="Save" width={100} onPress={handleSavePress} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -244,15 +276,7 @@ const BottomTabNavigatorComponent = () => {
       initialRouteName="Home"
       screenOptions={({route}) => ({
         tabBarShowLabel: false,
-        tabBarBackground() {
-          return (
-            <ImageBackground
-              source={require('../assets/cover.png')}
-              resizeMode="cover"
-              style={{width: '100%', height: '100%'}}
-            />
-          );
-        },
+
         tabBarIcon: ({color, size}) => {
           let iconName;
 
@@ -311,6 +335,34 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  textInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingHorizontal: 10,
   },
   header: {
     flexDirection: 'row',

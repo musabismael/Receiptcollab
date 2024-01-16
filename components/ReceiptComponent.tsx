@@ -1,28 +1,38 @@
 import React, {useState} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import ImagePicker from 'react-native-image-picker';
+import ImagePicker, {ImagePickerResponse} from 'react-native-image-picker';
 
-const ReceiptComponent = () => {
-  const [imageSource, setImageSource] = useState(null);
+interface ReceiptComponentProps {}
 
-  const handleUploadReceipt = () => {
-    ImagePicker.showImagePicker({title: 'Select Image'}, response => {
-      if (!response.didCancel && !response.error) {
-        // Image selected successfully
-        setImageSource({uri: response.uri});
-      }
-    });
+const ReceiptComponent: React.FC<ReceiptComponentProps> = () => {
+  const [imageSource, setImageSource] = useState<ImagePickerResponse | null>(
+    null,
+  );
+  const options = {
+    title: 'My Pic App',
+    takePhotoButtonTitle: 'Take photo with your camera',
+    chooseFromLibraryButtonTitle: 'Choose photo from library',
   };
 
+  const launchCamera = () => {
+    ImagePicker.launchCamera(options, response => {
+      console.log('Response = ', response);
+    });
+  };
+  const launchImageLibrary = () => {
+    ImagePicker.launchImageLibrary(options, response => {
+      console.log('Response = ', response);
+    });
+  };
   return (
     <View style={styles.container}>
       <TouchableOpacity
         style={[styles.actionButton, imageSource && styles.doneButton]}
-        onPress={handleUploadReceipt}
+        onPress={launchImageLibrary}
         activeOpacity={0.7}>
         {imageSource ? (
           <>
-            <Image source={imageSource} style={styles.image} />
+            <Image source={{uri: imageSource.uri}} style={styles.image} />
             <Text style={styles.buttonTextDone}>Done</Text>
           </>
         ) : (
@@ -31,11 +41,11 @@ const ReceiptComponent = () => {
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.actionButton, imageSource && styles.doneButton]}
-        onPress={handleUploadReceipt}
+        onPress={launchCamera}
         activeOpacity={0.7}>
         {imageSource ? (
           <>
-            <Image source={imageSource} style={styles.image} />
+            <Image source={{uri: imageSource.uri}} style={styles.image} />
             <Text style={styles.buttonTextDone}>Done</Text>
           </>
         ) : (
@@ -49,7 +59,6 @@ const ReceiptComponent = () => {
                 alignSelf: 'center',
               }}
             />
-
             <Text style={styles.buttonText}>Camera</Text>
           </View>
         )}

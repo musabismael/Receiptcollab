@@ -33,6 +33,7 @@ const ReceiptList = ({navigation}) => {
       };
 
       fetchReceipts();
+      console.log('receipts',receipts);
     }, []),
   );
   return (
@@ -49,10 +50,11 @@ const ReceiptList = ({navigation}) => {
                 category={receipt.receiptName}
                 detail={receipt.billAmount}
                 date={receipt.billDate}
+                qrCodeData={JSON.stringify(receipt)}
                 navigation={navigation}
               />
             ))}
-          </ScrollView>
+          </ScrollView>  
         </View>
       )}
     </View>

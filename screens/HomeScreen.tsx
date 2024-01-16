@@ -14,7 +14,7 @@ const HomeScreen = ({route, navigation}) => {
       setErrors('');
     }
   }, [text]);
-  
+
   const handleGetStarted = async () => {
     if (!errors) {
       let userId = await AsyncStorage.getItem('userId');
@@ -58,6 +58,7 @@ const HomeScreen = ({route, navigation}) => {
         onChangeText={inputText => setText(inputText)}
         style={styles.input}
       />
+      {errors && <Text style={{color: 'red'}}>{errors}</Text>}
 
       <CustomButton
         label="Get Started"
@@ -68,8 +69,6 @@ const HomeScreen = ({route, navigation}) => {
         onPress={handleGetStarted}
         borderRadius={20}
       />
-
-      {errors && <Text style={{color: 'red'}}>{errors}</Text>}
     </View>
   );
 };
