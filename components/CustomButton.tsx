@@ -1,49 +1,54 @@
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-type CustomButtonProps = {
-  onPress: () => void;
+interface CustomButtonProps {
   label: string;
-  size?: number;
-  bgColor?: string;
-  textColor?: string;
-  borderRadius?: number;
   width?: number;
-  height?: number;
-};
+  height?:number;
+  borderRadius?:number;
+  onPress: () => void;
+  textColor?: string;
+  bgColor?:string;
+  selected?: boolean; // Add selected prop
+}
 
-const CustomButton = ({
-  onPress,
+const CustomButton: React.FC<CustomButtonProps> = ({
   label,
-  width = 50,
-  height = 50,
-  bgColor = '#EBF3F2',
+  width = 60,
+  height = 40 ,
+  borderRadius = 10,
+  onPress,
   textColor = '#0A8E74',
-  borderRadius = 5,
-}: CustomButtonProps) => (
-  <TouchableOpacity
-    style={[
-      styles.button,
-      {
-        backgroundColor: bgColor,
-        width: width,
-        height: height,
-        borderRadius: borderRadius,
-      },
-    ]}
-    onPress={onPress}>
-    <Text style={[styles.text, {color: textColor}]}>{label}</Text>
-  </TouchableOpacity>
-);
+  bgColor = '#EBF3F2',
+  selected = false, // Initialize selected state
+}) => {
+  const buttonStyle = {
+    width,
+    backgroundColor: selected ? '#2A393C' : bgColor, // Change background color based on selected state
+    borderRadius: borderRadius,
+    paddingBottom:5,
+    height:height,
+    paddingVertical: 10,
+    alignItems: 'center',
+  };
+
+  const textStyle = {
+    color: selected ? '#FFFFFF' : textColor,
+  };
+
+  return (
+    <TouchableOpacity style={[styles.button, buttonStyle]} onPress={onPress}>
+      <Text style={[styles.buttonText, textStyle]}>{label}</Text>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   button: {
-    margin: 5, // add this line
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    marginHorizontal: 5,
+    borderColor: '#0A8E74',
   },
-  text: {
+  buttonText: {
     fontSize: 16,
   },
 });

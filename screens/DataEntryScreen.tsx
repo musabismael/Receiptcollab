@@ -14,57 +14,176 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import ReceiptList from './ReceiptList';
 import QRCodeScannerScreen from './QRCodeScannerScreen';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useState} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import QRCode from 'react-native-qrcode';
 
 interface Props {
   navigation: any;
 }
 
 const DataEntryScreen: React.FC<Props> = props => {
+  const [receiptName, setReceiptName] = useState('');
+  const [billDate, setBillDate] = useState('');
+  const [billAmount, setBillAmount] = useState('');
+  const [errorMessages, setErrorMessages] = useState('');
+  const [selectedButton, setSelectedButton] = useState('');
+  const [resultAmount, setResultAmount] = useState(0);
+  const [chooseButton, setChooseButton] = useState('');
+
+  const storgePress = async () => => {
+    try {
+      const userId = await AsyncStorage.getItem("userId");
+      if (!userId) {
+        setErrorMessages("Error: User ID not found in AsyncStorage.");
+        return;
+      }
+  
+      const newReceipt = {
+        receiptName,
+        billDate,
+        billAmount,
+        splitMode: chooseButton,
+        splitPerson: selectedButton,
+        resultAmount,
+      };
+  
+      if (!newReceipt.receiptName || !newReceipt.billDate || !newReceipt.billAmount || !newReceipt.splitMode || !newReceipt.splitPerson || newReceipt.resultAmount === 0) {
+        setErrorMessages("Error: Please fill in all fields.");
+        return;
+      }
+  
+      const existingReceiptsString = await AsyncStorage.getItem(userId);
+  
+      const existingReceipts = existingReceiptsString
+        ? JSON.parse(existingReceiptsString)
+        : [];
+  
+      existingReceipts.push(newReceipt);
+  
+      await AsyncStorage.setItem(userId, JSON.stringify(existingReceipts));
+  
+      // Generate QR code
+      const qrCodeData = JSON.stringify(newReceipt);
+      
+      const qrCodeImage = await QRCode.toDataURL(qrCodeData);
+  
+      // Store QR code in AsyncStorage
+      await AsyncStorage.setItem(`${userId}_qrCode`, qrCodeImage);
+  
+      setErrorMessages("Success: Receipt saved successfully!");
+      console.log("Receipt saved successfully!");
+    } catch (error) {
+      setErrorMessages("Error: Failed to save receipt to AsyncStorage.");
+      console.error("Error saving receipt to AsyncStorage:", error);
+    }
+  };
+  
+  
+  const handleSplitModePress = () => {
+    setErrorMessages('');
+
+    if (!receiptName.trim()) {
+      setErrorMessages('Please enter Receipt Name. ');
+      return;
+    }
+
+    if (!billDate.trim()) {
+      setErrorMessages(errorMessages + 'Please enter Bill Date. ');
+      return;
+    }
+
+    if (!billAmount.trim()) {
+      setErrorMessages(errorMessages + 'Please enter Bill Amount. ');
+      return;
+    }
+    if (chooseButton === '') {
+      setErrorMessages('Choose one of Equal / Custom. ');
+      return;
+    }
+    if (selectedButton === '') {
+      setErrorMessages('Please enter Split Person ');
+      return;
+    }
+    const amount = parseFloat(billAmount);
+
+    if (isNaN(amount) || amount <= 0) {
+      setErrorMessages('Please enter a valid Bill Amount. ');
+      return;
+    }
+
+    if (selectedButton === 'Custom') {
+      setErrorMessages('Custom split logic not implemented yet.');
+      return;
+    }
+    if (chooseButton === 'equal') {
+      const splitAmount = amount / parseInt(selectedButton);
+      setResultAmount(splitAmount);
+    }
+    if (chooseButton === 'custom') {
+      setResultAmount(amount);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.form}>
         <Text style={styles.headText}>Splitter</Text>
-        <TextInput placeholder="Receipt Name" style={styles.input} />
-        <TextInput placeholder="Bill date" style={styles.input} />
-        <TextInput placeholder="Bill Amount" style={styles.input} />
+        <TextInput
+          placeholder="Receipt Name"
+          style={styles.input}
+          value={receiptName}
+          onChangeText={text => setReceiptName(text)}
+        />
+        <TextInput
+          placeholder="Bill date"
+          style={styles.input}
+          value={billDate}
+          onChangeText={text => setBillDate(text)}
+        />
+
+        <TextInput
+          placeholder="Bill Amount"
+          style={styles.input}
+          value={billAmount}
+          keyboardType='numeric'
+          onChangeText={text => setBillAmount(text)}
+        />
+        <Text style={styles.errorText}>{errorMessages}</Text>
+
         <Text style={styles.headText2}>Split Person</Text>
       </View>
       <View style={styles.form2}>
         <CustomButton
           label="2"
           width={60}
-          onPress={() => {
-            alert('Person added');
-          }}
-          color="#00897b"
+          onPress={() => setSelectedButton('2')}
           textColor="#0A8E74"
+          selected={selectedButton === '2'}
         />
+
         <CustomButton
           label="3"
           width={60}
-          onPress={() => {
-            alert('Person added');
-          }}
-          color="#00897b"
+          onPress={() => setSelectedButton('3')}
           textColor="#0A8E74"
+          selected={selectedButton === '3'}
         />
+
         <CustomButton
           label="4"
           width={60}
-          onPress={() => {
-            alert('Person added');
-          }}
-          color="#00897b"
+          onPress={() => setSelectedButton('4')}
           textColor="#0A8E74"
+          selected={selectedButton === '4'}
         />
+
         <CustomButton
           label="Custom"
-          onPress={() => {
-            alert('Person added');
-          }}
+          onPress={() => setSelectedButton('Custom')}
           width={80}
-          color="#00897b"
           textColor="#0A8E74"
+          selected={selectedButton === 'Custom'}
         />
       </View>
       <View style={styles.form}>
@@ -73,21 +192,17 @@ const DataEntryScreen: React.FC<Props> = props => {
       <View style={styles.form2}>
         <CustomButton
           label="Equal"
-          onPress={() => {
-            alert('Person added');
-          }}
           width={70}
-          color="#00897b"
+          onPress={() => setChooseButton('equal')}
           textColor="#0A8E74"
+          selected={chooseButton === 'equal'}
         />
         <CustomButton
           label="Custom"
-          onPress={() => {
-            alert('Person added');
-          }}
           width={80}
-          color="#00897b"
+          onPress={() => setChooseButton('custom')}
           textColor="#0A8E74"
+          selected={chooseButton === 'custom'}
         />
       </View>
       <View style={styles.form}>
@@ -99,17 +214,22 @@ const DataEntryScreen: React.FC<Props> = props => {
         width={250}
         height={40}
         bgColor="#2A393C"
+        onPress={handleSplitModePress}
         textColor="#FFFFFF"
         borderRadius={20}
       />
       <View style={styles.footer}>
         <View style={styles.footerText}>
-          <Text style={{color: '#2A393C', fontWeight: 'normal'}}>$0</Text>
+          <Text style={{color: '#2A393C', fontWeight: 'normal'}}>
+            ${resultAmount}
+          </Text>
           <Text style={{right: 30}}> &#9829;</Text>
         </View>
         <View style={styles.footerText}>
           <Text>Total per person</Text>
-          <Text>Save to Library</Text>
+          <TouchableOpacity onPress={storgePress}>
+            <Text>Save to Library</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -151,11 +271,6 @@ const BottomTabNavigatorComponent = () => {
       <Tab.Screen
         options={{
           title: 'Calculator',
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.navigate('Entry')}>
-              <Icon name="arrow-back" size={24} color="#27C4A6" />
-            </TouchableOpacity>
-          ),
         }}
         name="List"
         component={ReceiptList}
@@ -164,6 +279,7 @@ const BottomTabNavigatorComponent = () => {
         name="Home"
         component={DataEntryScreen}
         options={{
+          title: '',
           headerLeft: () => (
             <Image
               source={require('../assets/logo.png')}
@@ -204,6 +320,12 @@ const styles = StyleSheet.create({
     paddingLeft: '10%',
     paddingRight: '10%',
   },
+
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 5,
+  },
   headText: {
     color: '#324E47',
     fontSize: 30,
@@ -242,6 +364,7 @@ const styles = StyleSheet.create({
   footer: {
     width: '90%',
     padding: 10,
+    marginTop: 10,
     borderTopWidth: 2,
     borderStyle: 'dashed',
     borderColor: '#2A393C',
