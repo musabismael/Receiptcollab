@@ -11,6 +11,7 @@ import CustomButton from '../components/CustomButton';
 import ReceiptComponent from '../components/ReceiptComponent';
 import {useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import uuid from 'react-native-uuid';
 
 interface Props {
   navigation: any;
@@ -31,6 +32,10 @@ const DataEntryScreen: React.FC<Props> = props => {
     setSelectedButton(inputValue);
     setModalVisible(false);
   };
+  const handleClosePress = () => {
+    setModalVisible(false);
+  };
+
   const storgePress = async () => {
     try {
       const userId = await AsyncStorage.getItem('userId');
@@ -38,7 +43,7 @@ const DataEntryScreen: React.FC<Props> = props => {
         setErrorMessages('Error: User ID not found in AsyncStorage.');
         return;
       }
-      const newReceiptId = Math.round(Math.random() * 1000000);
+      const newReceiptId = uuid.v4();
 
       const newReceipt = {
         newReceiptId,
@@ -71,8 +76,8 @@ const DataEntryScreen: React.FC<Props> = props => {
       existingReceipts.push(newReceipt);
 
       await AsyncStorage.setItem(userId, JSON.stringify(existingReceipts));
+      props.navigation.navigate('List');
 
-      setErrorMessages('Success: Receipt saved successfully!');
       console.log('Receipt saved successfully!');
     } catch (error) {
       setErrorMessages('Error: Failed to save receipt to AsyncStorage.');
@@ -233,9 +238,9 @@ const DataEntryScreen: React.FC<Props> = props => {
           <Text style={{right: 30}}> &#9829;</Text>
         </View>
         <View style={styles.footerText}>
-          <Text style={{color:'black'}}>Total per person</Text>
+          <Text style={{color: 'black'}}>Total per person</Text>
           <TouchableOpacity onPress={storgePress}>
-            <Text style={{color:'black'}}>Save to Library</Text>
+            <Text style={{color: 'black'}}>Save to Library</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -255,15 +260,27 @@ const DataEntryScreen: React.FC<Props> = props => {
               placeholder="Enter split person"
               keyboardType="numeric"
             />
-            <CustomButton label="Save" width={100} onPress={handleSavePress} />
+            <View style={{paddingBottom: 5}}>
+              <CustomButton
+                label="Save"
+                width={100}
+                onPress={handleSavePress}
+              />
+            </View>
+
+            <CustomButton
+              label="Close"
+              width={100}
+              onPress={handleSavePress}
+              bgColor="gray"
+              textColor="white"
+            />
           </View>
         </View>
       </Modal>
     </View>
   );
 };
-
-
 
 export default DataEntryScreen;
 
@@ -348,7 +365,7 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     width: '100%',
-    color:'black',
+    color: 'black',
     borderColor: '#AFCFCA',
     borderWidth: 1,
     backgroundColor: '#EBF3F2',

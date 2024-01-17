@@ -1,14 +1,18 @@
+import {useRoute} from '@react-navigation/native';
 import React from 'react';
-import {View, Text, Image, StyleSheet} from 'react-native';
+import {View, Text, Image, StyleSheet, Linking} from 'react-native';
+import {TextInput} from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-svg';
 
 interface Props {
   qrCodeData: string;
 }
 
-const QRCodeScreen: React.FC<Props> = ({qrCodeData}) => {
+const QRCodeScreen: React.FC = () => {
+  const route = useRoute();
+  const qrCodeData = route.params?.qrCodeData;
   console.log(qrCodeData);
-  
+
   return (
     <View style={styles.container}>
       <Text style={styles.textHeading}>Food Expense</Text>
@@ -30,8 +34,18 @@ const QRCodeScreen: React.FC<Props> = ({qrCodeData}) => {
             shadowColor: 'gray',
             borderRadius: 20,
           }}>
-          <QRCode value={JSON.stringify(qrCodeData)} size={200} color="#0A8E74" backgroundColor="white" />
+          <QRCode
+            value={JSON.stringify(qrCodeData)}
+            size={200}
+            color="#0A8E74"
+            backgroundColor="white"
+          />
         </View>
+        <Text
+          style={{color: 'blue', paddingTop: 10}}
+          onPress={() => Linking.openURL(qrCodeData.receiptUrl)}>
+          https://google.com
+        </Text>
       </View>
     </View>
   );
@@ -42,6 +56,17 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     alignItems: 'center',
     justifyContent: 'space-around',
+  },
+  input: {
+    height: 50,
+    width: '100%',
+    color: 'black',
+    borderColor: '#AFCFCA',
+    borderWidth: 1,
+    backgroundColor: '#EBF3F2',
+    marginVertical: 5,
+    borderRadius: 10,
+    paddingHorizontal: 10,
   },
   textHeading: {
     color: '#324E47',

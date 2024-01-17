@@ -17,14 +17,12 @@ const ExpenseItem: React.FC<Props> = ({
   qrCodeData,
   navigation,
 }) => {
-  const handleQRCodePress = () => {
-    console.log(qrCodeData);
-    
+  const handleQRCodePress = (qrCodeData: object) => {
     navigation.navigate('QRCode', {qrCodeData});
   };
-  const handleExpenseDetailCodePress = () => {
-
+  const handleExpenseDetailCodePress = (qrCodeData: object) => {
     navigation.navigate('ExpenseDetail', {qrCodeData});
+
   };
 
   return (
@@ -38,14 +36,15 @@ const ExpenseItem: React.FC<Props> = ({
         borderRadius: 10,
       }}>
       <View style={{flex: 1}}>
-        <TouchableOpacity onPress={handleExpenseDetailCodePress}>
+        <TouchableOpacity
+          onPress={() => handleExpenseDetailCodePress(qrCodeData)}>
           <Text style={{fontSize: 18, color: '#324E47'}}>{category}</Text>
           <Text style={{color: '#AFCFCA'}}>{detail}</Text>
           <Text style={{color: '#AFCFCA'}}>{date}</Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={handleQRCodePress}>
+      <TouchableOpacity onPress={() => handleQRCodePress(qrCodeData)}>
         <View
           style={{
             width: 120,
@@ -57,8 +56,11 @@ const ExpenseItem: React.FC<Props> = ({
             shadowColor: 'gray',
             borderRadius: 20,
           }}>
-          <QRCode value={JSON.stringify(qrCodeData)} color="#0A8E74" backgroundColor="white" />
-          
+          <QRCode
+            value={JSON.stringify(qrCodeData)}
+            color="#0A8E74"
+            backgroundColor="white"
+          />
         </View>
       </TouchableOpacity>
     </View>

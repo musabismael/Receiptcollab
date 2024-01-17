@@ -15,14 +15,14 @@ const ReceiptComponent: React.FC<ReceiptComponentProps> = () => {
   };
 
   const launchCamera = () => {
-    ImagePicker.launchCamera(options, response => {
-      console.log('Response = ', response);
-    });
+    // ImagePicker.launchCamera(options, response => {
+    //   console.log('Response = ', response);
+    // });
   };
   const launchImageLibrary = () => {
-    ImagePicker.launchImageLibrary(options, response => {
-      console.log('Response = ', response);
-    });
+    // ImagePicker.launchImageLibrary(options, response => {
+    //   console.log('Response = ', response);
+    // });
   };
   return (
     <View style={styles.container}>

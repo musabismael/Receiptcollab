@@ -1,15 +1,48 @@
 import React, {useEffect} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Alert,
+  Image,
+  Linking,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera, BarCodeReadEvent} from 'react-native-camera';
 import {NavigationProp} from '@react-navigation/native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface QrCodeScanProps {
   navigation: NavigationProp<any>;
 }
 const QrCodeScan: React.FC<QrCodeScanProps> = ({navigation}) => {
+  const onRead = async (e: BarCodeReadEvent) => {
+    var jsonObject = JSON.parse(e.data);
+    let userId = await AsyncStorage.getItem('userId');
 
-  const onRead = (result: BarCodeReadEvent) => {
+    if (jsonObject) {
+      navigation.navigate('Entry');
+      axios
+        .post('http://localhost:3000/log-scan', {
+          userId,
+          scannedData: jsonObject,
+        })
+        .then(response => {
+          Alert.alert(response)
+          console.log('Scan logged successfully', response);
+        })
+        .catch(error => {
+          console.error('Error logging scan:', error);
+        });
+      Alert.alert(
+        'Operation completed',
+        'The operation has been completed.',
+        [{text: 'OK', onPress: () => console.log('OK pressed')}],
+        {cancelable: false},
+      );
+    }
   };
   const handleCameraPress = (result: BarCodeReadEvent) => {
     navigation.navigate('Entry');
@@ -23,7 +56,7 @@ const QrCodeScan: React.FC<QrCodeScanProps> = ({navigation}) => {
         reactivate={true}
         topContent={
           <Image
-          source={require('../../assets/logo.png')} 
+            source={require('../../assets/logo.png')}
             style={{width: 100, height: 100, marginBottom: 30}}
           />
         }

@@ -1,3 +1,4 @@
+import { useRoute } from '@react-navigation/native';
 import React from 'react';
 import {View, Text, Image} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
@@ -6,10 +7,11 @@ interface ExpenseDetailScreenProps {
   qrCodeData: string;
 }
 
-const ExpenseDetailScreen: React.FC<ExpenseDetailScreenProps> = ({
-  qrCodeData,
-}) => {
-
+const ExpenseDetailScreen: React.FC<ExpenseDetailScreenProps> = () => {
+  const route = useRoute();
+  const qrCodeData = route.params?.qrCodeData;
+  console.log(qrCodeData);
+  
   return (
     <View style={{padding: 10}}>
       <Text style={{fontSize: 35, color: '#324E47', fontWeight: 'bold'}}>
