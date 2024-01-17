@@ -30,13 +30,13 @@ const QrCodeScan: React.FC<QrCodeScanProps> = ({navigation}) => {
           scannedData: jsonObject,
         })
         .then(response => {
-          Alert.alert(response)
           console.log('Scan logged successfully', response);
         })
         .catch(error => {
+
           console.error('Error logging scan:', error);
         });
-      Alert.alert(
+       Alert.alert(
         'Operation completed',
         'The operation has been completed.',
         [{text: 'OK', onPress: () => console.log('OK pressed')}],
