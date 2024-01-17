@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, Image} from 'react-native';
-import QRCode from 'react-native-qrcode';
+import QRCode from 'react-native-qrcode-svg';
 
 interface ExpenseDetailScreenProps {
   qrCodeData: string;
@@ -9,7 +9,6 @@ interface ExpenseDetailScreenProps {
 const ExpenseDetailScreen: React.FC<ExpenseDetailScreenProps> = ({
   qrCodeData,
 }) => {
-  console.log(qrCodeData);
 
   return (
     <View style={{padding: 10}}>
@@ -51,7 +50,7 @@ const ExpenseDetailScreen: React.FC<ExpenseDetailScreenProps> = ({
             borderRadius: 20,
             shadowColor: 'gray',
           }}>
-          <QRCode value={qrCodeData} fgColor="#0A8E74" bgColor="white" />
+          <QRCode value={JSON.stringify(qrCodeData)} color="#0A8E74" backgroundColor="white" />
         </View>
       </View>
 

@@ -51,7 +51,7 @@ const ReceiptComponent: React.FC<ReceiptComponentProps> = () => {
         ) : (
           <View>
             <Image
-              source={require('../assets/Camera.png')}
+              source={require('../../assets/Camera.png')}
               style={{
                 width: 20,
                 height: 20,

@@ -1,12 +1,14 @@
 import React from 'react';
 import {View, Text, Image, StyleSheet} from 'react-native';
-import QRCode from 'react-native-qrcode';
+import QRCode from 'react-native-qrcode-svg';
 
 interface Props {
   qrCodeData: string;
 }
 
 const QRCodeScreen: React.FC<Props> = ({qrCodeData}) => {
+  console.log(qrCodeData);
+  
   return (
     <View style={styles.container}>
       <Text style={styles.textHeading}>Food Expense</Text>
@@ -15,7 +17,6 @@ const QRCodeScreen: React.FC<Props> = ({qrCodeData}) => {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: '#EBF3F2',
           borderRadius: 10,
         }}>
         <View
@@ -29,7 +30,7 @@ const QRCodeScreen: React.FC<Props> = ({qrCodeData}) => {
             shadowColor: 'gray',
             borderRadius: 20,
           }}>
-          <QRCode value={qrCodeData} fgColor="#0A8E74" bgColor="white" />
+          <QRCode value={JSON.stringify(qrCodeData)} size={200} color="#0A8E74" backgroundColor="white" />
         </View>
       </View>
     </View>

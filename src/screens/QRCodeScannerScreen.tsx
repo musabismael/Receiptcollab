@@ -1,17 +1,20 @@
 import React, {useEffect} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import {RNCamera} from 'react-native-camera';
+import {RNCamera, BarCodeReadEvent} from 'react-native-camera';
+import {NavigationProp} from '@react-navigation/native';
 
-const QrCodeScan = ({navigation}: any) => {
-  useEffect(() => {}, []);
+interface QrCodeScanProps {
+  navigation: NavigationProp<any>;
+}
+const QrCodeScan: React.FC<QrCodeScanProps> = ({navigation}) => {
 
-  const onRead = result => {
-    console.log('Scanned data:', result.data);
+  const onRead = (result: BarCodeReadEvent) => {
   };
-  const handleCameraPress = result => {
-    navigation.navigate('Entry', {scannedData: result.data});
+  const handleCameraPress = (result: BarCodeReadEvent) => {
+    navigation.navigate('Entry');
   };
+
   return (
     <View style={styles.container}>
       <QRCodeScanner
@@ -20,7 +23,7 @@ const QrCodeScan = ({navigation}: any) => {
         reactivate={true}
         topContent={
           <Image
-            source={require('../assets/logo.png')}
+          source={require('../../assets/logo.png')} 
             style={{width: 100, height: 100, marginBottom: 30}}
           />
         }
@@ -28,7 +31,7 @@ const QrCodeScan = ({navigation}: any) => {
           <View style={styles.camera}>
             <TouchableOpacity onPress={handleCameraPress}>
               <Image
-                source={require('../assets/camera2.png')}
+                source={require('../../assets/camera2.png')}
                 style={{width: 50, height: 50}}
               />
             </TouchableOpacity>

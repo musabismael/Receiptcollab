@@ -9,10 +9,6 @@ import {
 } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import ReceiptComponent from '../components/ReceiptComponent';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import ReceiptList from './ReceiptList';
-import QRCodeScannerScreen from './QRCodeScannerScreen';
-import Icon from 'react-native-vector-icons/Ionicons';
 import {useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -32,7 +28,6 @@ const DataEntryScreen: React.FC<Props> = props => {
   const [inputValue, setInputValue] = useState('');
 
   const handleSavePress = () => {
-    console.log(inputValue);
     setSelectedButton(inputValue);
     setModalVisible(false);
   };
@@ -238,9 +233,9 @@ const DataEntryScreen: React.FC<Props> = props => {
           <Text style={{right: 30}}> &#9829;</Text>
         </View>
         <View style={styles.footerText}>
-          <Text>Total per person</Text>
+          <Text style={{color:'black'}}>Total per person</Text>
           <TouchableOpacity onPress={storgePress}>
-            <Text>Save to Library</Text>
+            <Text style={{color:'black'}}>Save to Library</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -268,62 +263,9 @@ const DataEntryScreen: React.FC<Props> = props => {
   );
 };
 
-const Tab = createBottomTabNavigator();
 
-const BottomTabNavigatorComponent = () => {
-  return (
-    <Tab.Navigator
-      initialRouteName="Home"
-      screenOptions={({route}) => ({
-        tabBarShowLabel: false,
 
-        tabBarIcon: ({color, size}) => {
-          let iconName;
-
-          if (route.name === 'List') {
-            iconName = 'library-outline';
-          } else if (route.name === 'Qrscan') {
-            iconName = 'qr-code';
-          } else if (route.name === 'Home') {
-            iconName = 'calculator-outline';
-          }
-          return <Icon name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#FFFFFF',
-        tabBarInactiveTintColor: '#8E9D97',
-      })}>
-      <Tab.Screen
-        options={{
-          title: 'Calculator',
-        }}
-        name="List"
-        component={ReceiptList}
-      />
-      <Tab.Screen
-        name="Home"
-        component={DataEntryScreen}
-        options={{
-          title: '',
-          headerLeft: () => (
-            <Image
-              source={require('../assets/logo.png')}
-              style={{width: 35, height: 35, marginLeft: '20%'}}
-            />
-          ),
-        }}
-      />
-      <Tab.Screen
-        options={{
-          headerShown: false,
-        }}
-        name="Qrscan"
-        component={QRCodeScannerScreen}
-      />
-    </Tab.Navigator>
-  );
-};
-
-export default BottomTabNavigatorComponent;
+export default DataEntryScreen;
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -406,6 +348,7 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     width: '100%',
+    color:'black',
     borderColor: '#AFCFCA',
     borderWidth: 1,
     backgroundColor: '#EBF3F2',

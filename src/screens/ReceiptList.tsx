@@ -1,12 +1,26 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import ExpenseItem from '../components/ExpenseItem';
+import React, { useEffect, useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ScrollView} from 'react-native-gesture-handler';
-import {useFocusEffect} from '@react-navigation/native';
+import ExpenseItem from '../components/ExpenseItem';
 
-const ReceiptList = ({navigation}) => {
-  const [receipts, setReceipts] = useState([]);
+interface Receipt {
+  receiptName: string;
+  billAmount: string;
+  billDate: string;
+}
+
+interface ReceiptListProps {
+  navigation: any; 
+}
+
+const ReceiptList: React.FC<ReceiptListProps> = ({ navigation }) => {
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
 
   useFocusEffect(
@@ -20,7 +34,7 @@ const ReceiptList = ({navigation}) => {
           }
 
           const userReceiptsString = await AsyncStorage.getItem(userId);
-          const userReceipts = userReceiptsString
+          const userReceipts: Receipt[] = userReceiptsString
             ? JSON.parse(userReceiptsString)
             : [];
 
@@ -33,28 +47,32 @@ const ReceiptList = ({navigation}) => {
       };
 
       fetchReceipts();
-      console.log('receipts',receipts);
+      
     }, []),
   );
+
   return (
     <View style={styles.container}>
       {loading ? (
-        <Text>Loading...</Text>
+        <Text style={{color:'red'}}>Loading...</Text>
       ) : (
-        <View style={{paddingLeft: 20, paddingRight: 20}}>
+        <View style={{ paddingLeft: 20, paddingRight: 20 }}>
           <Text style={styles.head}>Library</Text>
           <Text style={styles.subHead}>Previous 7 days</Text>
-          <ScrollView style={{paddingBottom: 10}}>
-            {receipts.map((receipt, index) => (
+          <ScrollView style={{ paddingBottom: 10 }}>
+            {receipts.map((receipt, index) => {
+            
+            return (
               <ExpenseItem
+                key={index}
                 category={receipt.receiptName}
                 detail={receipt.billAmount}
                 date={receipt.billDate}
-                qrCodeData={JSON.stringify(receipt)}
+                qrCodeData={receipt}
                 navigation={navigation}
               />
-            ))}
-          </ScrollView>  
+            )})}
+          </ScrollView>
         </View>
       )}
     </View>

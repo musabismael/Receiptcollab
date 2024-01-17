@@ -1,13 +1,13 @@
 import React from 'react';
 import {View, Text, Image, TouchableOpacity} from 'react-native';
-import QRCode from 'react-native-qrcode';
+import QRCode from 'react-native-qrcode-svg';
 
 interface Props {
   category: string;
   detail: string;
   date: string;
   qrCodeUri?: string;
-  qrCodeData?: string;
+  qrCodeData?: object;
 }
 
 const ExpenseItem: React.FC<Props> = ({
@@ -18,7 +18,8 @@ const ExpenseItem: React.FC<Props> = ({
   navigation,
 }) => {
   const handleQRCodePress = () => {
-
+    console.log(qrCodeData);
+    
     navigation.navigate('QRCode', {qrCodeData});
   };
   const handleExpenseDetailCodePress = () => {
@@ -56,7 +57,7 @@ const ExpenseItem: React.FC<Props> = ({
             shadowColor: 'gray',
             borderRadius: 20,
           }}>
-          <QRCode value={qrCodeData}   fgColor='#0A8E74' bgColor="white" />
+          <QRCode value={JSON.stringify(qrCodeData)} color="#0A8E74" backgroundColor="white" />
           
         </View>
       </TouchableOpacity>

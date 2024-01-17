@@ -1,11 +1,15 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, Image, TextInput, StyleSheet} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TextInput, StyleSheet } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const HomeScreen = ({route, navigation}) => {
-  const [text, setText] = useState('');
-  const [errors, setErrors] = useState('');
+interface HomeScreenProps {
+  navigation: any; // Replace with your specific navigation type
+}
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+  const [text, setText] = useState<string>('');
+  const [errors, setErrors] = useState<string>('');
 
   useEffect(() => {
     if (text.trim() === '') {
@@ -25,12 +29,14 @@ const HomeScreen = ({route, navigation}) => {
         await AsyncStorage.setItem('userId', userId);
       }
 
-      navigation.navigate('Entry');
+      navigation.navigate('Tab');
     }
   };
+
   const generateRandomId = () => {
     return Math.random().toString(36).substr(2, 10);
   };
+
   return (
     <View
       style={{
@@ -40,8 +46,8 @@ const HomeScreen = ({route, navigation}) => {
         backgroundColor: '#f5f5f5',
       }}>
       <Image
-        source={require('../assets/logo.png')}
-        style={{width: 100, height: 100, marginBottom: 5}}
+        source={require('../../assets/logo.png')} 
+        style={{ width: 100, height: 100, marginBottom: 5 }}
       />
       <Text
         style={{
@@ -55,10 +61,10 @@ const HomeScreen = ({route, navigation}) => {
 
       <TextInput
         placeholder="Enter Name"
-        onChangeText={inputText => setText(inputText)}
+        onChangeText={(inputText) => setText(inputText)}
         style={styles.input}
       />
-      {errors && <Text style={{color: 'red'}}>{errors}</Text>}
+      {errors && <Text style={{ color: 'red' }}>{errors}</Text>}
 
       <CustomButton
         label="Get Started"
@@ -72,10 +78,12 @@ const HomeScreen = ({route, navigation}) => {
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   input: {
     height: 50,
     width: '80%',
+    color:'black',
     borderColor: '#AFCFCA',
     borderWidth: 1,
     backgroundColor: '#EBF3F2',
@@ -84,4 +92,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 });
+
 export default HomeScreen;
