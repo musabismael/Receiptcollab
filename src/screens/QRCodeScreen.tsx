@@ -7,10 +7,12 @@ import {
   StyleSheet,
   Linking,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Props {
   qrCodeData: string;
@@ -22,23 +24,60 @@ const QRCodeScreen: React.FC = ({navigation}) => {
   const handleOpenReceipt = () => {
     navigation.navigate('Bill', {qrCodeData: qrCodeData});
   };
+  console.log( qrCodeData);
 
   const checkBill = async () => {
     try {
       const response = await axios.get(
         `http://192.168.50.38:3000/get-scan-info/${qrCodeData.newReceiptId}`,
-      ); // Pass newReceiptId as a parameter
+      );
+      console.log(qrCodeData.newReceiptId);
 
       if (response.status === 200) {
         console.log('Bill checked successfully:', response.data);
-        // Handle successful response here
+
+        const invoices = await AsyncStorage.getItem('userId');
+
+        if (invoices && response.data) {
+          const parsedInvoices = JSON.parse(invoices);
+          const matchedInvoice = parsedInvoices.find(
+            invoice => invoice.receiptId === response.data.receiptId,
+          );
+
+          if (matchedInvoice) {
+            console.log('Matched invoice:', matchedInvoice);
+
+            if (
+              JSON.stringify(matchedInvoice) !== JSON.stringify(response.data)
+            ) {
+              console.log(
+                'Bills are not similar, replacing the old with the new...',
+              );
+
+              const updatedInvoices = parsedInvoices.map(invoice =>
+                invoice.receiptId === response.data.receiptId
+                  ? response.data
+                  : invoice,
+              );
+
+              await AsyncStorage.setItem(
+                'userId',
+                JSON.stringify(updatedInvoices),
+              );
+              console.log('Invoice replaced successfully.');
+              Alert.alert(
+                'Congratulations! Your bill has been updated with the new information.',
+              );
+            }
+          } else {
+            console.log('No matched invoice found');
+          }
+        }
       } else {
         console.log('Error checking bill:', response.statusText);
-        // Handle error here
       }
     } catch (error) {
       console.error('API request error:', error.message);
-      // Handle error here
     }
   };
   return (

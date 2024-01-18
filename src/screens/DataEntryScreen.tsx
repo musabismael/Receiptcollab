@@ -97,7 +97,6 @@ const DataEntryScreen: React.FC<Props> = props => {
         ? JSON.parse(existingReceiptsString)
         : [];
 
-
       existingReceipts.push(newReceipt);
 
       await AsyncStorage.setItem(userId, JSON.stringify(existingReceipts));
