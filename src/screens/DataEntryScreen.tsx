@@ -1,6 +1,7 @@
 import {
   Image,
   Modal,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -12,6 +13,7 @@ import ReceiptComponent from '../components/ReceiptComponent';
 import {useState} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import uuid from 'react-native-uuid';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface Props {
   navigation: any;
@@ -19,7 +21,7 @@ interface Props {
 
 const DataEntryScreen: React.FC<Props> = props => {
   const [receiptName, setReceiptName] = useState('');
-  const [billDate, setBillDate] = useState('');
+  const [billDate, setBillDate] = useState(new Date());
   const [billAmount, setBillAmount] = useState('');
   const [errorMessages, setErrorMessages] = useState('');
   const [selectedButton, setSelectedButton] = useState('');
@@ -27,12 +29,24 @@ const DataEntryScreen: React.FC<Props> = props => {
   const [chooseButton, setChooseButton] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [show, setShow] = useState(false);
+  const [mode, setMode] = useState('date');
 
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShow(Platform.OS === 'ios');
+    setBillDate(currentDate);
+  };
+  const showMode = currentMode => {
+    setShow(true);
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode('date');
+  };
   const handleSavePress = () => {
     setSelectedButton(inputValue);
-    setModalVisible(false);
-  };
-  const handleClosePress = () => {
     setModalVisible(false);
   };
 
@@ -73,12 +87,20 @@ const DataEntryScreen: React.FC<Props> = props => {
         ? JSON.parse(existingReceiptsString)
         : [];
 
+      // const imageCamera = await AsyncStorage.getItem('receiptCameraUri');
+      // const imageUplaod = await AsyncStorage.getItem('receiptImageUri');
+
       existingReceipts.push(newReceipt);
 
       await AsyncStorage.setItem(userId, JSON.stringify(existingReceipts));
       props.navigation.navigate('List');
 
       console.log('Receipt saved successfully!');
+      setReceiptName('');
+      setBillAmount('');
+      setChooseButton('');
+      setSelectedButton('');
+      setResultAmount(0);
     } catch (error) {
       setErrorMessages('Error: Failed to save receipt to AsyncStorage.');
       console.error('Error saving receipt to AsyncStorage:', error);
@@ -90,11 +112,6 @@ const DataEntryScreen: React.FC<Props> = props => {
 
     if (!receiptName.trim()) {
       setErrorMessages('Please enter Receipt Name. ');
-      return;
-    }
-
-    if (!billDate.trim()) {
-      setErrorMessages(errorMessages + 'Please enter Bill Date. ');
       return;
     }
 
@@ -144,12 +161,12 @@ const DataEntryScreen: React.FC<Props> = props => {
           value={receiptName}
           onChangeText={text => setReceiptName(text)}
         />
-        <TextInput
+        {/* <TextInput
           placeholder="Bill date"
           style={styles.input}
           value={billDate}
           onChangeText={text => setBillDate(text)}
-        />
+        /> */}
 
         <TextInput
           placeholder="Bill Amount"
@@ -158,6 +175,22 @@ const DataEntryScreen: React.FC<Props> = props => {
           keyboardType="numeric"
           onChangeText={text => setBillAmount(text)}
         />
+        <CustomButton
+          onPress={showDatepicker}
+          width={100}
+          bgColor="#EBF3F2"
+          textColor="#AFCFCA"
+          label="Bill date"
+        />
+        {show && (
+          <DateTimePicker
+            testID="dateTimePicker"
+            value={billDate}
+            is24Hour={true}
+            display="default"
+            onChange={onChange}
+          />
+        )}
         <Text style={styles.errorText}>{errorMessages}</Text>
 
         <Text style={styles.headText2}>Split Person</Text>

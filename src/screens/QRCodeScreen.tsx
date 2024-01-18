@@ -1,6 +1,6 @@
 import {useRoute} from '@react-navigation/native';
 import React from 'react';
-import {View, Text, Image, StyleSheet, Linking} from 'react-native';
+import {View, Text, Image, StyleSheet, Linking, TouchableOpacity} from 'react-native';
 import {TextInput} from 'react-native-gesture-handler';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -8,11 +8,12 @@ interface Props {
   qrCodeData: string;
 }
 
-const QRCodeScreen: React.FC = () => {
+const QRCodeScreen: React.FC = ({navigation}) => {
   const route = useRoute();
   const qrCodeData = route.params?.qrCodeData;
-  console.log(qrCodeData);
-
+  const handleOpenReceipt = () => {
+    navigation.navigate('Bill', { qrCodeData: qrCodeData });
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.textHeading}>Food Expense</Text>
@@ -41,13 +42,14 @@ const QRCodeScreen: React.FC = () => {
             backgroundColor="white"
           />
         </View>
-        <Text
-          style={{color: 'blue', paddingTop: 10}}
-          onPress={() => Linking.openURL(qrCodeData.receiptUrl)}>
-          https://google.com
-        </Text>
+        <TouchableOpacity
+          style={{ paddingTop: 10 }}
+          onPress={handleOpenReceipt}
+        >
+          <Text style={{color: 'blue'}}>Open receipt URl</Text>
+        </TouchableOpacity>
       </View>
-    </View>
+      </View>
   );
 };
 const styles = StyleSheet.create({

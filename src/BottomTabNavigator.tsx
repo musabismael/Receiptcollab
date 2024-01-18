@@ -40,9 +40,7 @@ const BottomTabNavigatorComponent: React.FC = () => {
       <Tab.Screen
         options={{
           title: 'Calculator',
-          headerRight: () => (
-            <Icon name='reload' size={20} style={{paddingLeft:5}} color='gray' />
-          ),
+    
         }}
         name="List"
         component={ReceiptList}
