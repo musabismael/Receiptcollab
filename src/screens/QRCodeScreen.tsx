@@ -1,8 +1,16 @@
 import {useRoute} from '@react-navigation/native';
 import React from 'react';
-import {View, Text, Image, StyleSheet, Linking, TouchableOpacity} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Linking,
+  TouchableOpacity,
+} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
+import Icon from 'react-native-vector-icons/Ionicons';
+import axios from 'axios';
 
 interface Props {
   qrCodeData: string;
@@ -12,11 +20,31 @@ const QRCodeScreen: React.FC = ({navigation}) => {
   const route = useRoute();
   const qrCodeData = route.params?.qrCodeData;
   const handleOpenReceipt = () => {
-    navigation.navigate('Bill', { qrCodeData: qrCodeData });
+    navigation.navigate('Bill', {qrCodeData: qrCodeData});
+  };
+
+  const checkBill = async () => {
+    try {
+      const response = await axios.get(
+        `http://192.168.50.38:3000/get-scan-info/${qrCodeData.newReceiptId}`,
+      ); // Pass newReceiptId as a parameter
+
+      if (response.status === 200) {
+        console.log('Bill checked successfully:', response.data);
+        // Handle successful response here
+      } else {
+        console.log('Error checking bill:', response.statusText);
+        // Handle error here
+      }
+    } catch (error) {
+      console.error('API request error:', error.message);
+      // Handle error here
+    }
   };
   return (
     <View style={styles.container}>
       <Text style={styles.textHeading}>Food Expense</Text>
+
       <View
         style={{
           flex: 1,
@@ -42,14 +70,20 @@ const QRCodeScreen: React.FC = ({navigation}) => {
             backgroundColor="white"
           />
         </View>
-        <TouchableOpacity
-          style={{ paddingTop: 10 }}
-          onPress={handleOpenReceipt}
-        >
+        <TouchableOpacity style={{paddingTop: 10}} onPress={handleOpenReceipt}>
           <Text style={{color: 'blue'}}>Open receipt URl</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={{paddingTop: 10}} onPress={checkBill}>
+          <Icon
+            name="reload"
+            size={30}
+            style={{paddingLeft: 5}}
+            color="green"
+          />
+        </TouchableOpacity>
       </View>
-      </View>
+    </View>
   );
 };
 const styles = StyleSheet.create({

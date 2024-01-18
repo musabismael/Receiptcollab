@@ -4,7 +4,6 @@ import WebView from 'react-native-webview'
 
 const ReceiptBillScreen = ({ route, navigation }) => {
   const { qrCodeData } = route.params
-  console.log(qrCodeData)
   const html = `
     <html>
       <head>

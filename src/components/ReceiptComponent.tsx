@@ -1,22 +1,54 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useState} from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { PermissionsAndroid, Platform } from 'react-native';
+
 
 interface ReceiptComponentProps {}
 
 const ReceiptComponent: React.FC<ReceiptComponentProps> = () => {
   const [imageCameraUploaded, setCameraUploaded] = useState(false);
   const [imageUploaded, setImageUploaded] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const options = {
     title: 'My Pic App',
     takePhotoButtonTitle: 'Take photo with your camera',
     chooseFromLibraryButtonTitle: 'Choose photo from library',
   };
-
+  const requestCameraPermission = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: 'Camera Permission',
+            message: 'This app needs access to your camera to take photos.',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('Camera permission granted');
+        } else {
+          console.log('Camera permission denied');
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+  };
   const launchCameraUplaod = async () => {
     try {
+      await requestCameraPermission();
       const response = await launchCamera(options);
       if (response.didCancel) {
         console.log('User cancelled image capture');
@@ -33,9 +65,9 @@ const ReceiptComponent: React.FC<ReceiptComponentProps> = () => {
 
       const cameraUri = response.assets[0]['uri'];
       await AsyncStorage.setItem('receiptCameraUri', cameraUri);
-      if(cameraUri)
-      setImageUploaded(true);
-      setCameraUploaded(true);
+      if (cameraUri) setImageUploaded(false);
+      setCameraUploaded(false);
+      setModalVisible(true);
     } catch (error) {
       console.error('Error launching camera:', error);
     }
@@ -61,11 +93,15 @@ const ReceiptComponent: React.FC<ReceiptComponentProps> = () => {
       const imageUri = response.assets[0]['uri'];
 
       await AsyncStorage.setItem('receiptImageUri', imageUri);
-      if(imageUri)
-        setImageUploaded(true);
+      if (imageUri) setImageUploaded(false);
+      setModalVisible(true);
     } catch (error) {
       console.error('Error launching image library:', error);
     }
+  };
+
+  const handleModalClose = () => {
+    setModalVisible(false);
   };
 
   return (
@@ -101,6 +137,22 @@ const ReceiptComponent: React.FC<ReceiptComponentProps> = () => {
           </Text>
         </View>
       </TouchableOpacity>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={handleModalClose}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>Image saved successfully!</Text>
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={handleModalClose}>
+              <Text style={styles.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -136,5 +188,31 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: '#fff',
   },
 });

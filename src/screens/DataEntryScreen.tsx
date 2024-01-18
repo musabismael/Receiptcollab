@@ -58,7 +58,15 @@ const DataEntryScreen: React.FC<Props> = props => {
         return;
       }
       const newReceiptId = uuid.v4();
+      let receiptCameraUri = null;
+      let receiptImageUri = null;
 
+      try {
+        receiptCameraUri = await AsyncStorage.getItem('receiptCameraUri');
+        receiptImageUri = await AsyncStorage.getItem('receiptImageUri');
+      } catch (error) {
+        console.error('Error retrieving image URIs from AsyncStorage:', error);
+      }
       const newReceipt = {
         newReceiptId,
         receiptName,
@@ -67,6 +75,8 @@ const DataEntryScreen: React.FC<Props> = props => {
         splitMode: chooseButton,
         splitPerson: selectedButton,
         resultAmount,
+        receiptCameraUri,
+        receiptImageUri,
       };
 
       if (
@@ -87,8 +97,6 @@ const DataEntryScreen: React.FC<Props> = props => {
         ? JSON.parse(existingReceiptsString)
         : [];
 
-      // const imageCamera = await AsyncStorage.getItem('receiptCameraUri');
-      // const imageUplaod = await AsyncStorage.getItem('receiptImageUri');
 
       existingReceipts.push(newReceipt);
 
@@ -101,6 +109,8 @@ const DataEntryScreen: React.FC<Props> = props => {
       setChooseButton('');
       setSelectedButton('');
       setResultAmount(0);
+      await AsyncStorage.removeItem('receiptCameraUri');
+      await AsyncStorage.removeItem('receiptImageUri');
     } catch (error) {
       setErrorMessages('Error: Failed to save receipt to AsyncStorage.');
       console.error('Error saving receipt to AsyncStorage:', error);

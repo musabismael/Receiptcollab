@@ -20,23 +20,21 @@ interface QrCodeScanProps {
 const QrCodeScan: React.FC<QrCodeScanProps> = ({navigation}) => {
   const onRead = async (e: BarCodeReadEvent) => {
     var jsonObject = JSON.parse(e.data);
-    let userId = await AsyncStorage.getItem('userId');
 
     if (jsonObject) {
       navigation.navigate('Entry');
       axios
-        .post('http://localhost:3000/log-scan', {
-          userId,
+        .post('http://192.168.50.38:3000/log-scan', {
           scannedData: jsonObject,
         })
         .then(response => {
-          console.log('Scan logged successfully', response);
+          console.log(response.data);
         })
         .catch(error => {
-
-          console.error('Error logging scan:', error);
+          console.error(error);
         });
-       Alert.alert(
+
+      Alert.alert(
         'Operation completed',
         'The operation has been completed.',
         [{text: 'OK', onPress: () => console.log('OK pressed')}],
@@ -88,8 +86,10 @@ const styles = StyleSheet.create({
     marginTop: '10%',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 80,
-    width: 80,
+    height: 60,
+    width: 60,
+    marginBottom: '10%',
+
     overflow: 'hidden',
   },
 });

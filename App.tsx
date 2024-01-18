@@ -22,20 +22,7 @@ export default function App() {
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="ExpenseDetail" component={ExpenseDetailScreen} />
-        <Stack.Screen
-          options={{
-            headerRight: () => (
-              <Icon
-                name="reload"
-                size={20}
-                style={{paddingLeft: 5}}
-                color="gray"
-              />
-            ),
-          }}
-          name="QRCode"
-          component={QRCodeScreen}
-        />
+        <Stack.Screen name="QRCode" component={QRCodeScreen} />
         <Stack.Screen name="Entry" component={DataEntryScreen} />
         <Stack.Screen name="Bill" component={ReceiptBill} />
         <Stack.Screen name="Tab" component={Tab} />

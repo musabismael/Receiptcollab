@@ -1,55 +1,61 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   StyleSheet,
   Text,
   View,
   ScrollView,
-} from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import ExpenseItem from '../components/ExpenseItem';
+} from 'react-native'
+import { useFocusEffect } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import ExpenseItem from '../components/ExpenseItem'
 
 interface Receipt {
-  receiptName: string;
-  billAmount: string;
-  billDate: string;
+  receiptName: string
+  billAmount: string
+  billDate: string
 }
 
 interface ReceiptListProps {
-  navigation: any; 
+  navigation: any
 }
 
 const ReceiptList: React.FC<ReceiptListProps> = ({ navigation }) => {
-  const [receipts, setReceipts] = useState<Receipt[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [receipts, setReceipts] = useState<Receipt[]>([])
+  const [loading, setLoading] = useState(true)
 
   useFocusEffect(
     React.useCallback(() => {
       const fetchReceipts = async () => {
         try {
-          const userId = await AsyncStorage.getItem('userId');
+          const userId = await AsyncStorage.getItem('userId')
           if (!userId) {
-            console.error('User ID not found in AsyncStorage.');
-            return;
+            console.error('User ID not found in AsyncStorage.')
+            return
           }
 
-          const userReceiptsString = await AsyncStorage.getItem(userId);
+          const userReceiptsString = await AsyncStorage.getItem(userId)
           const userReceipts: Receipt[] = userReceiptsString
             ? JSON.parse(userReceiptsString)
-            : [];
+            : []
 
-          setReceipts(userReceipts);
-          setLoading(false);
+          // Sort the receipts array by billDate
+          userReceipts.sort((a, b) => {
+            const dateA = new Date(a.billDate)
+            const dateB = new Date(b.billDate)
+            return dateA.getTime() - dateB.getTime()
+          })
+
+          setReceipts(userReceipts)
+          setLoading(false)
         } catch (error) {
-          console.error('Error fetching receipts from AsyncStorage:', error);
-          setLoading(false);
+          console.error('Error fetching receipts from AsyncStorage:', error)
+          setLoading(false)
         }
-      };
+      }
 
-      fetchReceipts();
-      
-    }, []),
-  );
+      fetchReceipts()
+    }, [])
+  )
 
   return (
     <View style={styles.container}>
@@ -59,10 +65,8 @@ const ReceiptList: React.FC<ReceiptListProps> = ({ navigation }) => {
         <View style={{ paddingLeft: 20, paddingRight: 20 }}>
           <Text style={styles.head}>Library</Text>
           <Text style={styles.subHead}>Previous 7 days</Text>
-          <ScrollView style={{ paddingBottom: 10 }}>
-            {receipts.map((receipt, index) => {
-            
-            return (
+          <ScrollView style={{ height: '80%', paddingBottom: 10 }}>
+            {receipts.map((receipt, index) => (
               <ExpenseItem
                 key={index}
                 category={receipt.receiptName}
@@ -71,33 +75,33 @@ const ReceiptList: React.FC<ReceiptListProps> = ({ navigation }) => {
                 qrCodeData={receipt}
                 navigation={navigation}
               />
-            )})}
+            ))}
           </ScrollView>
         </View>
       )}
     </View>
-  );
-};
+  )
+}
 
-export default ReceiptList;
+export default ReceiptList
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#fff'
   },
   head: {
     fontSize: 30,
     fontWeight: 'bold',
     color: '#324E47',
     padding: 5,
-    fontStyle: 'normal',
+    fontStyle: 'normal'
   },
   subHead: {
     fontSize: 15,
     padding: 5,
     fontWeight: 'normal',
     color: '#324E47',
-    fontStyle: 'normal',
+    fontStyle: 'normal'
   },
-});
+})
